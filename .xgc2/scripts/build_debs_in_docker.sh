@@ -57,6 +57,7 @@ docker run --rm \
       fakeroot \
       file \
       git \
+      netbase \
       rsync \
       ros-noetic-diagnostic-msgs \
       ros-noetic-geometry-msgs \
