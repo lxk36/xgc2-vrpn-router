@@ -21,6 +21,7 @@ struct HealthConfig {
   double stuck_angle_epsilon_deg = 0.2;
   double max_translation_jump_m = 1.0;
   double max_rotation_jump_deg = 45.0;
+  double jump_report_hold_s = 0.5;
   double max_reference_delta_m = 2.0;
 };
 
@@ -67,8 +68,11 @@ class HealthMonitor {
         config_.stuck_timeout_s);
   }
 
-  void detectJump(const Pose& pose) {
+  void detectJump(const Pose& pose, double now_s) {
     jump_.evaluate(pose, config_.max_translation_jump_m, config_.max_rotation_jump_deg);
+    if (jump_.detected()) {
+      jump_report_until_s_ = now_s + config_.jump_report_hold_s;
+    }
   }
 
   double estimateInputRate() const { return input_rate_.rateHz(); }
@@ -96,7 +100,7 @@ class HealthMonitor {
     if (stuck_.stuck()) {
       snapshot.problems.push_back("vrpn_stuck");
     }
-    if (jump_.detected()) {
+    if (jump_.detected() || now_s <= jump_report_until_s_) {
       snapshot.problems.push_back("vrpn_jump");
     }
     if (reference_delta_.aboveMax(config_.max_reference_delta_m)) {
@@ -115,6 +119,7 @@ class HealthMonitor {
   unsigned long long received_count_ = 0;
   unsigned long long published_count_ = 0;
   unsigned long long dropped_by_rate_count_ = 0;
+  double jump_report_until_s_ = -1.0;
 };
 
 }  // namespace vrpn_router::core

@@ -66,6 +66,7 @@ docker run --rm \
       ros-noetic-rospack \
       ros-noetic-rostest \
       ros-noetic-rosunit \
+      ros-noetic-vrpn \
       ros-noetic-vrpn-client-ros
 
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root

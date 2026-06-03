@@ -1,0 +1,41 @@
+<launch>
+  <node pkg="vrpn_router"
+        type="vrpn_router_test_vrpn_server_node"
+        name="vrpn_protocol_server"
+        output="screen">
+    <param name="port" value="3984"/>
+    <param name="publish_rate_hz" value="120.0"/>
+    <param name="jump_after_s" value="1.0"/>
+  </node>
+
+  <node pkg="vrpn_client_ros"
+        type="vrpn_client_node"
+        name="vrpn_client_node"
+        output="screen">
+    <rosparam>
+      server: 127.0.0.1
+      port: 3984
+      update_frequency: 120.0
+      frame_id: mocap
+      use_server_time: false
+      broadcast_tf: false
+      refresh_tracker_frequency: 0.0
+      trackers:
+        - uav1
+        - uav2
+        - ugv1
+    </rosparam>
+  </node>
+
+  <rosparam command="load" file="$(find vrpn_router)/test/routes_complex.yaml"/>
+
+  <node pkg="vrpn_router"
+        type="vrpn_router_node"
+        name="vrpn_router"
+        output="screen"/>
+
+  <test test-name="vrpn_router_protocol_e2e"
+        pkg="vrpn_router"
+        type="vrpn_router_protocol_e2e.py"
+        time-limit="30"/>
+</launch>

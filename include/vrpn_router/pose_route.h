@@ -95,7 +95,7 @@ class PoseRoute {
 
     const core::Pose transformed = transformer_.apply(toCorePose(msg->pose));
     health_.updateStuckState(transformed, now_s);
-    health_.detectJump(transformed);
+    health_.detectJump(transformed, now_s);
 
     if (!rate_limiter_.shouldPublish(now_s)) {
       health_.onRateDrop();

@@ -124,11 +124,30 @@ TEST(HealthMonitor, ReportsJumpWithoutBlockingPolicy) {
 
   health.onInput(0.0);
   health.onPublish(Pose{{0.0, 0.0, 0.0}, {}});
-  health.detectJump(Pose{{2.0, 0.0, 0.0}, {}});
+  health.detectJump(Pose{{2.0, 0.0, 0.0}, {}}, 0.1);
   const auto snapshot = health.snapshot(0.1);
 
   EXPECT_NE(std::find(snapshot.problems.begin(), snapshot.problems.end(), "vrpn_jump"), snapshot.problems.end());
   EXPECT_EQ(snapshot.published_count, 1u);
+}
+
+TEST(HealthMonitor, HoldsTransientJumpLongEnoughForDiagnostics) {
+  HealthConfig config;
+  config.max_rotation_jump_deg = 10.0;
+  config.jump_report_hold_s = 0.5;
+  HealthMonitor health(config);
+
+  const double s = std::sqrt(0.5);
+  health.onPublish(Pose{{0.0, 0.0, 0.0}, {}});
+  health.detectJump(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 1.0);
+  health.onPublish(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}});
+  health.detectJump(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 1.1);
+
+  const auto held = health.snapshot(1.2);
+  EXPECT_NE(std::find(held.problems.begin(), held.problems.end(), "vrpn_jump"), held.problems.end());
+
+  const auto expired = health.snapshot(1.6);
+  EXPECT_EQ(std::find(expired.problems.begin(), expired.problems.end(), "vrpn_jump"), expired.problems.end());
 }
 
 TEST(HealthMonitor, ReportsTimeoutStuckAndReferenceDelta) {
