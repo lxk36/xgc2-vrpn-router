@@ -3,10 +3,12 @@
   <param name="vrpn_router/mavros_pose_suffix" value="vision_pose/pose"/>
   <param name="vrpn_router/output_frame_id" value="map"/>
   <param name="vrpn_router/max_output_rate_hz" value="50.0"/>
+  <param name="vrpn_router/diagnostics_rate_hz" value="10.0"/>
   <param name="vrpn_router/min_input_rate_hz" value="30.0"/>
   <param name="vrpn_router/max_input_rate_hz" value="80.0"/>
   <param name="vrpn_router/stale_timeout_s" value="0.2"/>
   <param name="vrpn_router/stuck_timeout_s" value="0.1"/>
+  <param name="vrpn_router/stuck_position_epsilon_m" value="0.01"/>
   <param name="vrpn_router/max_translation_jump_m" value="0.5"/>
   <param name="vrpn_router/max_reference_delta_m" value="0.5"/>
   <rosparam param="vrpn_router/field_offset">{x: 10.0, y: 0.0, z: 0.0}</rosparam>

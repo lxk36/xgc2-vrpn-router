@@ -9,7 +9,7 @@ vrpn_router:
   max_input_rate_hz: 90.0
   stale_timeout_s: 0.4
   stuck_timeout_s: 0.2
-  stuck_position_epsilon_m: 5.0e-7
+  stuck_position_epsilon_m: 5.0e-8
   stuck_angle_epsilon_deg: 0.05
   max_translation_jump_m: 2.0
   max_rotation_jump_deg: 20.0

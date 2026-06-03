@@ -50,7 +50,6 @@ class HealthMonitor {
   void onRateDrop() { ++dropped_by_rate_count_; }
 
   void onPublish(const Pose& pose) {
-    jump_.setReferenceOutput(pose);
     reference_delta_.setOutput(pose);
     ++published_count_;
   }

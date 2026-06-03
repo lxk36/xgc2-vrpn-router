@@ -41,6 +41,13 @@ class VrpnRouterProtocolE2ETest(unittest.TestCase):
             rospy.sleep(0.05)
         return False
 
+    def saw_diag_problem(self, route_name, problem):
+        for array in self.diagnostics:
+            for status in array.status:
+                if status.name.endswith(route_name) and problem in status.message:
+                    return True
+        return False
+
     def latest_diag_value(self, route_name, key):
         for array in reversed(self.diagnostics):
             for status in array.status:
@@ -72,6 +79,7 @@ class VrpnRouterProtocolE2ETest(unittest.TestCase):
         rospy.sleep(1.5)
         self.assertTrue(self.wait_for_diag_problem("uav1", "input_rate_high"))
         self.assertTrue(self.wait_for_diag_problem("uav2", "vrpn_jump"))
+        self.assertFalse(self.saw_diag_problem("uav1", "vrpn_stuck"))
 
         for key in ("uav1", "uav2", "ugv1"):
             published = self.latest_diag_value(key, "published_count")

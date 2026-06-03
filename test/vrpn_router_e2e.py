@@ -66,6 +66,26 @@ class VrpnRouterE2ETest(unittest.TestCase):
             rospy.sleep(0.05)
         return False
 
+    def publish_static_until_diag_problem(self, problem, x, timeout=4.0, hz=100.0):
+        rate = rospy.Rate(hz)
+        deadline = rospy.Time.now() + rospy.Duration(timeout)
+        while rospy.Time.now() < deadline and not rospy.is_shutdown():
+            self.pub.publish(self.noisy_pose(x))
+            for array in self.diagnostics:
+                for status in array.status:
+                    if status.name.endswith("uav1") and problem in status.message:
+                        return True
+            rate.sleep()
+        return False
+
+    def latest_diag_messages(self):
+        messages = []
+        for array in self.diagnostics[-5:]:
+            for status in array.status:
+                if status.name.endswith("uav1"):
+                    messages.append(status.message)
+        return messages
+
     def test_offset_downsample_jump_stuck_timeout_and_reference_delta(self):
         self.publish_burst(120, 1.0, start_x=1.0, velocity=0.05)
         rospy.sleep(0.3)
@@ -87,10 +107,10 @@ class VrpnRouterE2ETest(unittest.TestCase):
         rospy.sleep(0.2)
         self.assertTrue(self.wait_for_diag_problem("reference_delta_high"))
 
-        for _ in range(30):
-            self.pub.publish(self.noisy_pose(2.0))
-            rospy.sleep(0.01)
-        self.assertTrue(self.wait_for_diag_problem("vrpn_stuck"))
+        self.assertTrue(
+            self.publish_static_until_diag_problem("vrpn_stuck", 2.0),
+            f"latest diagnostics: {self.latest_diag_messages()}, outputs={len(self.outputs)}",
+        )
 
         rospy.sleep(0.4)
         self.assertTrue(self.wait_for_diag_problem("vrpn_timeout"))

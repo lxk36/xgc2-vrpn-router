@@ -89,11 +89,37 @@ TEST(TimeoutDetector, ReportsMissingAndStaleInput) {
 
 TEST(JumpDetector, ReportsTranslationJump) {
   JumpDetector detector;
-  detector.setReferenceOutput(Pose{{0.0, 0.0, 0.0}, {}});
+  detector.evaluate(Pose{{0.0, 0.0, 0.0}, {}}, 0.5, 45.0);
+  EXPECT_FALSE(detector.detected());
+
   detector.evaluate(Pose{{2.0, 0.0, 0.0}, {}}, 0.5, 45.0);
 
   EXPECT_TRUE(detector.detected());
   EXPECT_NEAR(detector.lastTranslationM(), 2.0, 1e-9);
+}
+
+TEST(JumpDetector, ReportsRotationJumpWithoutTranslationJump) {
+  JumpDetector detector;
+  const double s = std::sqrt(0.5);
+
+  detector.evaluate(Pose{{0.0, 0.0, 0.0}, {}}, 0.5, 20.0);
+  detector.evaluate(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 0.5, 20.0);
+
+  EXPECT_TRUE(detector.detected());
+  EXPECT_NEAR(detector.lastTranslationM(), 0.0, 1e-9);
+  EXPECT_GT(detector.lastRotationDeg(), 20.0);
+}
+
+TEST(JumpDetector, UsesAdjacentInputFrames) {
+  JumpDetector detector;
+
+  detector.evaluate(Pose{{0.0, 0.0, 0.0}, {}}, 0.5, 45.0);
+  detector.evaluate(Pose{{10.0, 0.0, 0.0}, {}}, 0.5, 45.0);
+  EXPECT_TRUE(detector.detected());
+
+  detector.evaluate(Pose{{10.1, 0.0, 0.0}, {}}, 0.5, 45.0);
+  EXPECT_FALSE(detector.detected());
+  EXPECT_NEAR(detector.lastTranslationM(), 0.1, 1e-9);
 }
 
 TEST(StuckDetector, ReportsRepeatedPoseAfterTimeout) {
@@ -101,11 +127,33 @@ TEST(StuckDetector, ReportsRepeatedPoseAfterTimeout) {
   const Pose pose{{1.0, 0.0, 0.0}, {}};
 
   detector.observe(pose, 0.0, 0.001, 0.2, 0.1);
-  detector.observe(pose, 0.2, 0.001, 0.2, 0.1);
+  detector.observe(pose, 0.05, 0.001, 0.2, 0.1);
+  detector.observe(pose, 0.10, 0.001, 0.2, 0.1);
   EXPECT_TRUE(detector.stuck());
 
   detector.observe(Pose{{1.1, 0.0, 0.0}, {}}, 0.21, 0.001, 0.2, 0.1);
   EXPECT_FALSE(detector.stuck());
+}
+
+TEST(StuckDetector, DoesNotReportWhenWindowNoiseExceedsThreshold) {
+  StuckDetector detector;
+
+  detector.observe(Pose{{1.0, 0.0, 0.0}, {}}, 0.00, 5.0e-8, 0.2, 0.10);
+  detector.observe(Pose{{1.0 + 1.0e-7, 0.0, 0.0}, {}}, 0.05, 5.0e-8, 0.2, 0.10);
+  detector.observe(Pose{{1.0 - 1.0e-7, 0.0, 0.0}, {}}, 0.10, 5.0e-8, 0.2, 0.10);
+
+  EXPECT_FALSE(detector.stuck());
+}
+
+TEST(StuckDetector, UsesDiscreteWindowBoundarySample) {
+  StuckDetector detector;
+  const Pose pose{{1.0, 0.0, 0.0}, {}};
+
+  for (int i = 0; i <= 11; ++i) {
+    detector.observe(pose, static_cast<double>(i) * 0.01, 0.001, 0.2, 0.10);
+  }
+
+  EXPECT_TRUE(detector.stuck());
 }
 
 TEST(ReferenceDeltaDetector, ReportsLargeDelta) {
@@ -124,6 +172,7 @@ TEST(HealthMonitor, ReportsJumpWithoutBlockingPolicy) {
 
   health.onInput(0.0);
   health.onPublish(Pose{{0.0, 0.0, 0.0}, {}});
+  health.detectJump(Pose{{0.0, 0.0, 0.0}, {}}, 0.0);
   health.detectJump(Pose{{2.0, 0.0, 0.0}, {}}, 0.1);
   const auto snapshot = health.snapshot(0.1);
 
@@ -138,15 +187,14 @@ TEST(HealthMonitor, HoldsTransientJumpLongEnoughForDiagnostics) {
   HealthMonitor health(config);
 
   const double s = std::sqrt(0.5);
-  health.onPublish(Pose{{0.0, 0.0, 0.0}, {}});
-  health.detectJump(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 1.0);
-  health.onPublish(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}});
+  health.detectJump(Pose{{0.0, 0.0, 0.0}, {}}, 1.0);
   health.detectJump(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 1.1);
+  health.detectJump(Pose{{0.0, 0.0, 0.0}, {0.0, 0.0, s, s}}, 1.2);
 
   const auto held = health.snapshot(1.2);
   EXPECT_NE(std::find(held.problems.begin(), held.problems.end(), "vrpn_jump"), held.problems.end());
 
-  const auto expired = health.snapshot(1.6);
+  const auto expired = health.snapshot(1.61);
   EXPECT_EQ(std::find(expired.problems.begin(), expired.problems.end(), "vrpn_jump"), expired.problems.end());
 }
 
@@ -160,9 +208,10 @@ TEST(HealthMonitor, ReportsTimeoutStuckAndReferenceDelta) {
   const Pose pose{{0.0, 0.0, 0.0}, {}};
   health.onInput(0.0);
   health.updateStuckState(pose, 0.0);
+  health.updateStuckState(pose, 0.05);
+  health.updateStuckState(pose, 0.1);
   health.onPublish(pose);
   health.onReference(Pose{{2.0, 0.0, 0.0}, {}});
-  health.updateStuckState(pose, 0.2);
   const auto snapshot = health.snapshot(0.3);
 
   EXPECT_NE(std::find(snapshot.problems.begin(), snapshot.problems.end(), "vrpn_timeout"), snapshot.problems.end());
