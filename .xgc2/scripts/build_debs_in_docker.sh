@@ -58,11 +58,13 @@ docker run --rm \
       file \
       git \
       rsync \
+      ros-noetic-diagnostic-msgs \
       ros-noetic-geometry-msgs \
       ros-noetic-mavros \
       ros-noetic-roscpp \
       ros-noetic-roslaunch \
       ros-noetic-rospack \
+      ros-noetic-tf2 \
       ros-noetic-vrpn-client-ros
 
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root

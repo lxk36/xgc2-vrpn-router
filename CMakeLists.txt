@@ -2,13 +2,15 @@ cmake_minimum_required(VERSION 3.0.2)
 project(vrpn_router)
 
 find_package(catkin REQUIRED COMPONENTS
+  diagnostic_msgs
   geometry_msgs
   roscpp
+  tf2
   xmlrpcpp
 )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp xmlrpcpp
+  CATKIN_DEPENDS diagnostic_msgs geometry_msgs roscpp tf2 xmlrpcpp
 )
 
 include_directories(
