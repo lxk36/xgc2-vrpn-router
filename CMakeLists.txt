@@ -36,11 +36,6 @@ install(DIRECTORY config launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-catkin_install_python(PROGRAMS
-  scripts/vrpn_router_extreme_sim.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   catkin_add_gtest(vrpn_router_core_tests test/core_tests.cpp)

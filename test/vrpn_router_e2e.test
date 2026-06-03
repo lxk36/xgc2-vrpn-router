@@ -4,7 +4,7 @@
   <param name="vrpn_router/output_frame_id" value="map"/>
   <param name="vrpn_router/max_output_rate_hz" value="50.0"/>
   <param name="vrpn_router/min_input_rate_hz" value="30.0"/>
-  <param name="vrpn_router/max_input_rate_hz" value="150.0"/>
+  <param name="vrpn_router/max_input_rate_hz" value="80.0"/>
   <param name="vrpn_router/stale_timeout_s" value="0.2"/>
   <param name="vrpn_router/stuck_timeout_s" value="0.1"/>
   <param name="vrpn_router/max_translation_jump_m" value="0.5"/>
