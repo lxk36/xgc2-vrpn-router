@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>vrpn_router</name>
+  <version>0.0.0</version>
+  <description>Route VRPN tracker poses to MAVROS vision pose topics.</description>
+
+  <maintainer email="lxk@todo.todo">lxk</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>xmlrpcpp</build_depend>
+
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>xmlrpcpp</build_export_depend>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>roslaunch</exec_depend>
+  <exec_depend>vrpn_client_ros</exec_depend>
+  <exec_depend>xmlrpcpp</exec_depend>
+</package>

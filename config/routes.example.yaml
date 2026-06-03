@@ -1,0 +1,12 @@
+vrpn_router:
+  vrpn_pose_suffix: pose
+  mavros_pose_suffix: vision_pose/pose
+  output_frame_id: map
+  queue_size: 10
+  routes:
+    - tracker: uav1
+      mavros_ns: /uav1/mavros
+    - tracker: uav2
+      mavros_ns: /uav2/mavros
+    - tracker: fs150
+      mavros_ns: /fs150/mavros

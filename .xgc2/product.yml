@@ -1,0 +1,33 @@
+schema: xgc2.product.v1
+id: xgc2-vrpn-router
+name: XGC2 VRPN Router
+version: 1.0.0-1
+kind: ros1-apt
+summary: Route VRPN tracker poses into MAVROS vision pose inputs.
+
+ros:
+  distro: noetic
+  packages:
+    - vrpn_router
+
+apt:
+  distribution: focal
+  install:
+    - ros-noetic-xgc2-vrpn-router
+  packages:
+    - ros-noetic-xgc2-vrpn-router
+  depends:
+    - ros-noetic-vrpn-client-ros
+    - ros-noetic-mavros
+
+usage:
+  install: |
+    sudo apt update
+    sudo apt install ros-noetic-xgc2-vrpn-router
+  smoke_test: |
+    roslaunch --files vrpn_router vrpn_router.launch
+
+ownership:
+  paths:
+    - /opt/ros/noetic/share/vrpn_router
+    - /opt/ros/noetic/lib/vrpn_router
