@@ -1,6 +1,11 @@
 #include "vrpn_router/core/health_monitor.h"
+#include "vrpn_router/core/input_rate_detector.h"
+#include "vrpn_router/core/jump_detector.h"
 #include "vrpn_router/core/pose_transformer.h"
 #include "vrpn_router/core/rate_limiter.h"
+#include "vrpn_router/core/reference_delta_detector.h"
+#include "vrpn_router/core/stuck_detector.h"
+#include "vrpn_router/core/timeout_detector.h"
 #include "vrpn_router/core/types.h"
 #include "vrpn_router/route_config.h"
 
@@ -12,10 +17,15 @@
 
 using vrpn_router::core::HealthConfig;
 using vrpn_router::core::HealthMonitor;
+using vrpn_router::core::InputRateDetector;
+using vrpn_router::core::JumpDetector;
 using vrpn_router::core::Pose;
 using vrpn_router::core::PoseTransformer;
 using vrpn_router::core::Quat;
 using vrpn_router::core::RateLimiter;
+using vrpn_router::core::ReferenceDeltaDetector;
+using vrpn_router::core::StuckDetector;
+using vrpn_router::core::TimeoutDetector;
 using vrpn_router::core::Transform;
 using vrpn_router::core::Vec3;
 
@@ -53,6 +63,58 @@ TEST(RateLimiter, AllowsApproximateUniformDownsampling) {
   }
   EXPECT_GE(published, 35);
   EXPECT_LE(published, 55);
+}
+
+TEST(InputRateDetector, ReportsRateBand) {
+  InputRateDetector detector;
+  for (int i = 0; i < 20; ++i) {
+    detector.record(static_cast<double>(i) * 0.01);
+  }
+
+  EXPECT_NEAR(detector.rateHz(), 100.0, 1e-6);
+  EXPECT_FALSE(detector.belowMin(50.0));
+  EXPECT_TRUE(detector.aboveMax(80.0));
+}
+
+TEST(TimeoutDetector, ReportsMissingAndStaleInput) {
+  TimeoutDetector detector;
+
+  EXPECT_TRUE(detector.timedOut(1.0, 0.3));
+  EXPECT_NEAR(detector.ageS(1.0), -1.0, 1e-9);
+
+  detector.recordInput(1.0);
+  EXPECT_FALSE(detector.timedOut(1.2, 0.3));
+  EXPECT_TRUE(detector.timedOut(1.4, 0.3));
+}
+
+TEST(JumpDetector, ReportsTranslationJump) {
+  JumpDetector detector;
+  detector.setReferenceOutput(Pose{{0.0, 0.0, 0.0}, {}});
+  detector.evaluate(Pose{{2.0, 0.0, 0.0}, {}}, 0.5, 45.0);
+
+  EXPECT_TRUE(detector.detected());
+  EXPECT_NEAR(detector.lastTranslationM(), 2.0, 1e-9);
+}
+
+TEST(StuckDetector, ReportsRepeatedPoseAfterTimeout) {
+  StuckDetector detector;
+  const Pose pose{{1.0, 0.0, 0.0}, {}};
+
+  detector.observe(pose, 0.0, 0.001, 0.2, 0.1);
+  detector.observe(pose, 0.2, 0.001, 0.2, 0.1);
+  EXPECT_TRUE(detector.stuck());
+
+  detector.observe(Pose{{1.1, 0.0, 0.0}, {}}, 0.21, 0.001, 0.2, 0.1);
+  EXPECT_FALSE(detector.stuck());
+}
+
+TEST(ReferenceDeltaDetector, ReportsLargeDelta) {
+  ReferenceDeltaDetector detector;
+  detector.setOutput(Pose{{0.0, 0.0, 0.0}, {}});
+  detector.setReference(Pose{{2.0, 0.0, 0.0}, {}});
+
+  EXPECT_NEAR(detector.deltaM(), 2.0, 1e-9);
+  EXPECT_TRUE(detector.aboveMax(0.5));
 }
 
 TEST(HealthMonitor, ReportsJumpWithoutBlockingPolicy) {
