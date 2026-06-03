@@ -54,7 +54,15 @@ ssh_args=(
   -o IdentitiesOnly=yes
 )
 
-scp "${ssh_args[@]}" "${debs[@]}" "${APT_REPO_USER}@${APT_REPO_HOST}:incoming/"
+scp_args=(
+  -i "${key_file}"
+  -P "${APT_REPO_PORT}"
+  -o UserKnownHostsFile="${known_hosts_file}"
+  -o StrictHostKeyChecking=yes
+  -o IdentitiesOnly=yes
+)
+
+scp "${scp_args[@]}" "${debs[@]}" "${APT_REPO_USER}@${APT_REPO_HOST}:incoming/"
 ssh "${ssh_args[@]}" "${APT_REPO_USER}@${APT_REPO_HOST}" "publish ${APT_REPO_DISTRIBUTION}"
 
 echo "published ${DEB_DIR}/*.deb to ${APT_REPO_HOST}:${APT_REPO_PORT} distribution ${APT_REPO_DISTRIBUTION}"
