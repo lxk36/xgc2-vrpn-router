@@ -69,6 +69,7 @@ mkdir -p "${pkg_root}"
 
 copy_path "${PREFIX_ROOT}/share/${ROS_PACKAGE}" "${pkg_root}"
 copy_path "${PREFIX_ROOT}/lib/${ROS_PACKAGE}" "${pkg_root}"
+copy_path "${PREFIX_ROOT}/include/${ROS_PACKAGE}" "${pkg_root}"
 
 mkdir -p "${pkg_root}/DEBIAN" "${pkg_root}/usr/share/doc/${PACKAGE}"
 cat > "${pkg_root}/DEBIAN/control" <<EOF
@@ -78,7 +79,7 @@ Section: misc
 Priority: optional
 Architecture: ${ARCH}
 Maintainer: XGC2 <apt@example.com>
-Depends: ros-${ROS_DISTRO}-roscpp, ros-${ROS_DISTRO}-diagnostic-msgs, ros-${ROS_DISTRO}-geometry-msgs, ros-${ROS_DISTRO}-roslaunch, ros-${ROS_DISTRO}-tf2, ros-${ROS_DISTRO}-vrpn-client-ros, ros-${ROS_DISTRO}-mavros
+Depends: ros-${ROS_DISTRO}-roscpp, ros-${ROS_DISTRO}-diagnostic-msgs, ros-${ROS_DISTRO}-geometry-msgs, ros-${ROS_DISTRO}-roslaunch, ros-${ROS_DISTRO}-vrpn-client-ros, ros-${ROS_DISTRO}-mavros
 Description: XGC2 VRPN tracker pose router for MAVROS vision pose inputs
 EOF
 printf 'xgc2-vrpn-router package\n' > "${pkg_root}/usr/share/doc/${PACKAGE}/README"

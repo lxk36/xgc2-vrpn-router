@@ -1,7 +1,7 @@
 schema: xgc2.product.v1
 id: xgc2-vrpn-router
 name: XGC2 VRPN Router
-version: 1.0.1-1
+version: 1.0.2-1
 kind: ros1-apt
 summary: Route VRPN tracker poses into MAVROS vision pose inputs.
 
@@ -18,7 +18,6 @@ apt:
     - ros-noetic-xgc2-vrpn-router
   depends:
     - ros-noetic-diagnostic-msgs
-    - ros-noetic-tf2
     - ros-noetic-vrpn-client-ros
     - ros-noetic-mavros
 
@@ -32,4 +31,5 @@ usage:
 ownership:
   paths:
     - /opt/ros/noetic/share/vrpn_router
+    - /opt/ros/noetic/include/vrpn_router
     - /opt/ros/noetic/lib/vrpn_router

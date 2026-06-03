@@ -14,7 +14,6 @@ vrpn_router:
   max_translation_jump_m: 1.0
   max_rotation_jump_deg: 45.0
   max_reference_delta_m: 2.0
-  drop_on_jump: true
   field_offset:
     x: 0.0
     y: 0.0

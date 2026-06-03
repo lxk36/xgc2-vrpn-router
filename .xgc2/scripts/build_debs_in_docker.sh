@@ -64,7 +64,8 @@ docker run --rm \
       ros-noetic-roscpp \
       ros-noetic-roslaunch \
       ros-noetic-rospack \
-      ros-noetic-tf2 \
+      ros-noetic-rostest \
+      ros-noetic-rosunit \
       ros-noetic-vrpn-client-ros
 
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root
@@ -73,6 +74,9 @@ docker run --rm \
 
     cd /workspace/work
     source /opt/ros/noetic/setup.bash
+    catkin_make run_tests_vrpn_router
+    catkin_test_results
+
     DESTDIR=/workspace/work/install-root catkin_make install \
       -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic \
       -DCMAKE_BUILD_TYPE=Release \
