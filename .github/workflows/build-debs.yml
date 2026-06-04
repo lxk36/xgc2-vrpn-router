@@ -77,7 +77,8 @@ jobs:
                 ros-noetic-rostest \
                 ros-noetic-rosunit \
                 ros-noetic-tf2 \
-                ros-noetic-vrpn
+                ros-noetic-vrpn \
+                ros-noetic-vrpn-client-ros
               rm -rf /workspace/test-ws
               mkdir -p /workspace/test-ws/src/vrpn_router
               rsync -a --delete /workspace/vrpn-router/ /workspace/test-ws/src/vrpn_router/
