@@ -5,7 +5,7 @@
         output="screen">
     <param name="port" value="3984"/>
     <param name="publish_rate_hz" value="120.0"/>
-    <param name="jump_after_s" value="1.0"/>
+    <param name="jump_after_s" value="3.0"/>
   </node>
 
   <node pkg="vrpn_client_ros"
