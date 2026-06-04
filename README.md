@@ -80,6 +80,11 @@ roslaunch vrpn_router vrpn_router.launch \
   trackers:=uav1
 ```
 
+The built-in `vrpn_client_ros` launch path does not publish TF by default.
+The router path is responsible for forwarding checked pose messages into
+MAVROS, not for owning the global TF tree.  If a downstream visualization-only
+workflow explicitly needs tracker TF frames, opt in with `broadcast_tf:=true`.
+
 Input topics normally follow the `vrpn_client_ros` convention:
 
 ```text

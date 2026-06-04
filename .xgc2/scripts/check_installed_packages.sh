@@ -12,6 +12,10 @@ roslaunch --dump-params vrpn_router vrpn_router.launch \
   trackers:=uav1 \
   | grep -F "/vrpn_client_node/use_server_time: true" >/dev/null
 roslaunch --dump-params vrpn_router vrpn_router.launch \
+  refresh_tracker_frequency:=0.0 \
+  trackers:=uav1 \
+  | grep -F "/vrpn_client_node/broadcast_tf: false" >/dev/null
+roslaunch --dump-params vrpn_router vrpn_router.launch \
   use_server_time:=true \
   refresh_tracker_frequency:=0.0 \
   trackers:=uav1 \

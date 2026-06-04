@@ -8,7 +8,7 @@
   <arg name="start_vrpn_client" default="true"/>
   <arg name="update_frequency" default="100.0"/>
   <arg name="use_server_time" default="false"/>
-  <arg name="broadcast_tf" default="true"/>
+  <arg name="broadcast_tf" default="false"/>
   <arg name="refresh_tracker_frequency" default="1.0"/>
   <arg name="trackers" default=""/>
 
