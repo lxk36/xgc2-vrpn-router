@@ -5,7 +5,7 @@
 namespace vrpn_router::core {
 
 class JumpDetector {
- public:
+public:
   void evaluate(const Pose& pose, double max_translation_m, double max_rotation_deg) {
     detected_ = false;
     if (!has_previous_) {
@@ -24,7 +24,7 @@ class JumpDetector {
   double lastTranslationM() const { return last_translation_m_; }
   double lastRotationDeg() const { return last_rotation_deg_; }
 
- private:
+private:
   Pose previous_pose_;
   double last_translation_m_ = 0.0;
   double last_rotation_deg_ = 0.0;
@@ -32,4 +32,4 @@ class JumpDetector {
   bool detected_ = false;
 };
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core

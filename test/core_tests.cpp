@@ -8,10 +8,12 @@
 #include "vrpn_router/core/timeout_detector.h"
 #include "vrpn_router/core/types.h"
 #include "vrpn_router/route_config.h"
+#include "vrpn_router/topic_utils.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -232,6 +234,63 @@ TEST(RouteConfig, LoadsParameterizedRoute) {
   EXPECT_EQ(config.output_topic, "/uav1/mavros/vision_pose/pose");
   EXPECT_EQ(config.output_frame_id, "map");
   EXPECT_NEAR(config.max_output_rate_hz, 40.0, 1e-9);
+}
+
+TEST(RouteConfig, RejectsInvalidNumericLimits) {
+  XmlRpc::XmlRpcValue route;
+  route["tracker"] = "uav1";
+  route["mavros_ns"] = "/uav1/mavros";
+  route["max_output_rate_hz"] = -1.0;
+
+  EXPECT_THROW(vrpn_router::loadRoute(route, 0, "pose", "vision_pose/pose", "map", vrpn_router::RouteConfig{}),
+               std::runtime_error);
+}
+
+TEST(RouteConfig, RejectsEmptyDerivedTopics) {
+  XmlRpc::XmlRpcValue route;
+  route["tracker"] = "uav1";
+  route["mavros_ns"] = "";
+
+  EXPECT_THROW(vrpn_router::loadRoute(route, 0, "", "", "map", vrpn_router::RouteConfig{}), std::runtime_error);
+}
+
+TEST(RouteConfig, RejectsEmptyTracker) {
+  XmlRpc::XmlRpcValue route;
+  route["tracker"] = "";
+  route["mavros_ns"] = "/uav1/mavros";
+
+  EXPECT_THROW(vrpn_router::loadRoute(route, 0, "pose", "vision_pose/pose", "map", vrpn_router::RouteConfig{}),
+               std::runtime_error);
+}
+
+TEST(RouteConfig, RejectsNonFiniteDefaultLimit) {
+  XmlRpc::XmlRpcValue route;
+  route["tracker"] = "uav1";
+  route["mavros_ns"] = "/uav1/mavros";
+
+  vrpn_router::RouteConfig defaults;
+  defaults.max_output_rate_hz = std::numeric_limits<double>::quiet_NaN();
+
+  EXPECT_THROW(vrpn_router::loadRoute(route, 0, "pose", "vision_pose/pose", "map", defaults), std::runtime_error);
+}
+
+TEST(RouteConfig, RejectsZeroQuaternion) {
+  XmlRpc::XmlRpcValue route;
+  route["tracker"] = "uav1";
+  route["mavros_ns"] = "/uav1/mavros";
+  route["tracker_to_body"]["rotation"]["x"] = 0.0;
+  route["tracker_to_body"]["rotation"]["y"] = 0.0;
+  route["tracker_to_body"]["rotation"]["z"] = 0.0;
+  route["tracker_to_body"]["rotation"]["w"] = 0.0;
+
+  EXPECT_THROW(vrpn_router::loadRoute(route, 0, "pose", "vision_pose/pose", "map", vrpn_router::RouteConfig{}),
+               std::runtime_error);
+}
+
+TEST(TopicUtils, JoinsEmptySuffixWithoutReadingPastEnd) {
+  EXPECT_EQ(vrpn_router::joinTopic("", ""), "");
+  EXPECT_EQ(vrpn_router::joinTopic("/", ""), "/");
+  EXPECT_EQ(vrpn_router::joinTopic("/uav1/mavros", ""), "/uav1/mavros");
 }
 
 int main(int argc, char** argv) {

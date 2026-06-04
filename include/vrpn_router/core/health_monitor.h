@@ -38,7 +38,7 @@ struct HealthSnapshot {
 };
 
 class HealthMonitor {
- public:
+public:
   explicit HealthMonitor(HealthConfig config = {}) : config_(config) {}
 
   void onInput(double now_s) {
@@ -54,17 +54,11 @@ class HealthMonitor {
     ++published_count_;
   }
 
-  void onReference(const Pose& pose) {
-    reference_delta_.setReference(pose);
-  }
+  void onReference(const Pose& pose) { reference_delta_.setReference(pose); }
 
   void updateStuckState(const Pose& pose, double now_s) {
-    stuck_.observe(
-        pose,
-        now_s,
-        config_.stuck_position_epsilon_m,
-        config_.stuck_angle_epsilon_deg,
-        config_.stuck_timeout_s);
+    stuck_.observe(pose, now_s, config_.stuck_position_epsilon_m, config_.stuck_angle_epsilon_deg,
+                   config_.stuck_timeout_s);
   }
 
   void detectJump(const Pose& pose, double now_s) {
@@ -108,7 +102,7 @@ class HealthMonitor {
     return snapshot;
   }
 
- private:
+private:
   HealthConfig config_;
   InputRateDetector input_rate_;
   JumpDetector jump_;
@@ -121,4 +115,4 @@ class HealthMonitor {
   double jump_report_until_s_ = -1.0;
 };
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core

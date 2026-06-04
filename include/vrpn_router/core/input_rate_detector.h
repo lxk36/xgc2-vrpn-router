@@ -6,7 +6,7 @@
 namespace vrpn_router::core {
 
 class InputRateDetector {
- public:
+public:
   explicit InputRateDetector(std::size_t window_size = 50) : window_size_(window_size) {}
 
   void record(double now_s) {
@@ -41,11 +41,11 @@ class InputRateDetector {
 
   bool aboveMax(double max_rate_hz) const { return rateHz() > max_rate_hz; }
 
- private:
+private:
   std::deque<double> intervals_s_;
   std::size_t window_size_;
   double last_time_s_ = 0.0;
   bool has_last_time_ = false;
 };
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core

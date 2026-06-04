@@ -43,6 +43,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(vrpn_router_core_tests test/core_tests.cpp)
   if(TARGET vrpn_router_core_tests)
+    target_compile_features(vrpn_router_core_tests PUBLIC cxx_std_17)
     target_link_libraries(vrpn_router_core_tests ${catkin_LIBRARIES})
   endif()
 

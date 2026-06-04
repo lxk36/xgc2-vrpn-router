@@ -7,7 +7,88 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cpp-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run C++ static quality gate
+        run: |
+          docker run --rm \
+            -e DEBIAN_FRONTEND=noninteractive \
+            -v "$GITHUB_WORKSPACE:/workspace/vrpn-router" \
+            ros:noetic-ros-base-focal \
+            bash -lc '
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                build-essential \
+                clang-format \
+                clang-tidy \
+                cmake \
+                git \
+                netbase \
+                ros-noetic-diagnostic-msgs \
+                ros-noetic-geometry-msgs \
+                ros-noetic-roscpp \
+                ros-noetic-rostest \
+                ros-noetic-rosunit \
+                ros-noetic-tf2 \
+                ros-noetic-vrpn
+              cd /workspace/vrpn-router
+              .xgc2/scripts/check_cpp_quality.sh
+            '
+
+  package-tests:
+    runs-on: ubuntu-latest
+    needs: cpp-quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check package compliance and tests
+        run: |
+          test -f package.xml
+          test -f .xgc2/product.yml
+          test -x .xgc2/scripts/build_debs_in_docker.sh
+          test -x .xgc2/scripts/check_cpp_quality.sh
+          test -x .xgc2/scripts/check_installed_packages.sh
+          test -x .xgc2/scripts/package_debs.sh
+          test -x .xgc2/scripts/publish_apt_repo.sh
+          grep -F '<name>vrpn_router</name>' package.xml
+          grep -F 'id: xgc2-vrpn-router' .xgc2/product.yml
+          grep -F 'ros-noetic-xgc2-vrpn-router' .xgc2/product.yml
+          bash -n .xgc2/scripts/*.sh
+          docker run --rm \
+            -e DEBIAN_FRONTEND=noninteractive \
+            -v "$GITHUB_WORKSPACE:/workspace/vrpn-router:ro" \
+            ros:noetic-ros-base-focal \
+            bash -lc '
+              set -euo pipefail
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                build-essential \
+                cmake \
+                git \
+                netbase \
+                rsync \
+                ros-noetic-diagnostic-msgs \
+                ros-noetic-geometry-msgs \
+                ros-noetic-roscpp \
+                ros-noetic-rostest \
+                ros-noetic-rosunit \
+                ros-noetic-tf2 \
+                ros-noetic-vrpn
+              rm -rf /workspace/test-ws
+              mkdir -p /workspace/test-ws/src/vrpn_router
+              rsync -a --delete /workspace/vrpn-router/ /workspace/test-ws/src/vrpn_router/
+              cd /workspace/test-ws
+              source /opt/ros/noetic/setup.bash
+              catkin_make run_tests_vrpn_router
+              catkin_test_results
+            '
+
+  build-debs:
+    needs: package-tests
     strategy:
       fail-fast: false
       matrix:
@@ -37,6 +118,24 @@ jobs:
         with:
           name: xgc2-vrpn-router-debs-${{ matrix.arch }}
           path: debs/*.deb
+
+  publish-apt:
+    runs-on: ubuntu-latest
+    needs: build-debs
+    env:
+      APT_REPO_HOST: ${{ secrets.APT_REPO_HOST }}
+      APT_REPO_PORT: ${{ secrets.APT_REPO_PORT }}
+      APT_REPO_SSH_KEY: ${{ secrets.APT_REPO_SSH_KEY }}
+      APT_REPO_KNOWN_HOSTS: ${{ secrets.APT_REPO_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download deb artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: xgc2-vrpn-router-debs-*
+          path: debs
+          merge-multiple: true
 
       - name: Publish to self-hosted APT repository
         if: ${{ env.APT_REPO_HOST != '' && env.APT_REPO_PORT != '' && env.APT_REPO_SSH_KEY != '' && env.APT_REPO_KNOWN_HOSTS != '' }}

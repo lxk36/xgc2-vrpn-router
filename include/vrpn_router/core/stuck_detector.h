@@ -8,7 +8,7 @@
 namespace vrpn_router::core {
 
 class StuckDetector {
- public:
+public:
   void observe(const Pose& pose, double now_s, double position_epsilon_m, double angle_epsilon_deg, double timeout_s) {
     samples_.push_back({now_s, pose});
     prune(now_s, timeout_s);
@@ -27,7 +27,7 @@ class StuckDetector {
 
   bool stuck() const { return stuck_; }
 
- private:
+private:
   struct Sample {
     double time_s = 0.0;
     Pose pose;
@@ -44,4 +44,4 @@ class StuckDetector {
   bool stuck_ = false;
 };
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core

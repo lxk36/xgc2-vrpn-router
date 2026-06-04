@@ -5,10 +5,24 @@
 #include <ros/ros.h>
 
 #include <algorithm>
+#include <cmath>
 #include <exception>
 #include <memory>
 #include <stdexcept>
 #include <vector>
+
+namespace {
+
+void validateNodeParameters(int queue_size, double diagnostics_rate_hz) {
+  if (queue_size <= 0) {
+    throw std::runtime_error("queue_size must be positive");
+  }
+  if (!std::isfinite(diagnostics_rate_hz) || diagnostics_rate_hz <= 0.0) {
+    throw std::runtime_error("diagnostics_rate_hz must be finite and positive");
+  }
+}
+
+} // namespace
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "vrpn_router");
@@ -21,6 +35,7 @@ int main(int argc, char** argv) {
   pnh.param<double>("diagnostics_rate_hz", diagnostics_rate_hz, diagnostics_rate_hz);
 
   try {
+    validateNodeParameters(queue_size, diagnostics_rate_hz);
     const auto route_configs = vrpn_router::loadRoutes(pnh);
     if (route_configs.empty()) {
       throw std::runtime_error("at least one route is required");
@@ -33,10 +48,8 @@ int main(int argc, char** argv) {
     }
 
     vrpn_router::DiagnosticsPublisher diagnostics(nh, routes);
-    ros::Timer diagnostics_timer =
-        nh.createTimer(ros::Duration(1.0 / std::max(0.1, diagnostics_rate_hz)),
-                       &vrpn_router::DiagnosticsPublisher::publish,
-                       &diagnostics);
+    ros::Timer diagnostics_timer = nh.createTimer(ros::Duration(1.0 / std::max(0.1, diagnostics_rate_hz)),
+                                                  &vrpn_router::DiagnosticsPublisher::publish, &diagnostics);
 
     ros::spin();
   } catch (const std::exception& ex) {

@@ -22,4 +22,4 @@ inline void addKv(diagnostic_msgs::DiagnosticStatus& status, const std::string& 
   status.values.push_back(kv);
 }
 
-}  // namespace vrpn_router
+} // namespace vrpn_router

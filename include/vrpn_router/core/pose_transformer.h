@@ -5,7 +5,7 @@
 namespace vrpn_router::core {
 
 class PoseTransformer {
- public:
+public:
   void setTrackerToBody(const Transform& transform) { tracker_to_body_ = transform; }
   void setFieldOffset(const Vec3& offset) { field_offset_ = offset; }
 
@@ -17,9 +17,9 @@ class PoseTransformer {
     return world_body;
   }
 
- private:
+private:
   Transform tracker_to_body_;
   Vec3 field_offset_;
 };
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core

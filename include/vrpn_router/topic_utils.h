@@ -19,13 +19,13 @@ inline std::string normalizeNamespace(std::string value) {
 
 inline std::string joinTopic(const std::string& ns, const std::string& suffix) {
   const std::string normalized = normalizeNamespace(ns);
-  if (normalized.empty() || normalized == "/") {
-    return suffix.front() == '/' ? suffix : "/" + suffix;
-  }
   if (suffix.empty()) {
     return normalized;
+  }
+  if (normalized.empty() || normalized == "/") {
+    return suffix.front() == '/' ? suffix : "/" + suffix;
   }
   return normalized + (suffix.front() == '/' ? suffix : "/" + suffix);
 }
 
-}  // namespace vrpn_router
+} // namespace vrpn_router

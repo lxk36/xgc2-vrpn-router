@@ -18,25 +18,22 @@
 namespace vrpn_router {
 
 class PoseRoute {
- public:
+public:
   PoseRoute(ros::NodeHandle& nh, RouteConfig config, int queue_size)
-      : config_(std::move(config)),
-        rate_limiter_(config_.max_output_rate_hz),
-        health_(toHealthConfig(config_)) {
+      : config_(std::move(config)), rate_limiter_(config_.max_output_rate_hz), health_(toHealthConfig(config_)) {
     transformer_.setTrackerToBody(config_.tracker_to_body);
     transformer_.setFieldOffset(config_.field_offset);
 
     publisher_ = nh.advertise<geometry_msgs::PoseStamped>(config_.output_topic, queue_size);
-    subscriber_ = nh.subscribe<geometry_msgs::PoseStamped>(
-        config_.input_topic, queue_size, &PoseRoute::poseCallback, this);
+    subscriber_ =
+        nh.subscribe<geometry_msgs::PoseStamped>(config_.input_topic, queue_size, &PoseRoute::poseCallback, this);
     if (!config_.reference_topic.empty()) {
-      reference_subscriber_ = nh.subscribe<geometry_msgs::PoseStamped>(
-          config_.reference_topic, queue_size, &PoseRoute::referenceCallback, this);
+      reference_subscriber_ = nh.subscribe<geometry_msgs::PoseStamped>(config_.reference_topic, queue_size,
+                                                                       &PoseRoute::referenceCallback, this);
     }
 
-    ROS_INFO_STREAM("vrpn route " << config_.name << ": " << config_.input_topic << " -> "
-                                  << config_.output_topic << ", max_output_rate="
-                                  << config_.max_output_rate_hz << " Hz");
+    ROS_INFO_STREAM("vrpn route " << config_.name << ": " << config_.input_topic << " -> " << config_.output_topic
+                                  << ", max_output_rate=" << config_.max_output_rate_hz << " Hz");
   }
 
   diagnostic_msgs::DiagnosticStatus diagnosticStatus(const ros::Time& now) const {
@@ -44,8 +41,8 @@ class PoseRoute {
     diagnostic_msgs::DiagnosticStatus status;
     status.name = "vrpn_router/" + config_.name;
     status.hardware_id = config_.tracker;
-    status.level = snapshot.problems.empty() ? diagnostic_msgs::DiagnosticStatus::OK
-                                             : diagnostic_msgs::DiagnosticStatus::WARN;
+    status.level =
+        snapshot.problems.empty() ? diagnostic_msgs::DiagnosticStatus::OK : diagnostic_msgs::DiagnosticStatus::WARN;
     status.message = snapshot.problems.empty() ? "OK" : joinProblems(snapshot.problems);
 
     addKv(status, "input_topic", config_.input_topic);
@@ -57,11 +54,12 @@ class PoseRoute {
     addKv(status, "age_s", snapshot.age_s < 0.0 ? "none" : toString(snapshot.age_s));
     addKv(status, "last_jump_translation_m", toString(snapshot.last_jump_translation_m));
     addKv(status, "last_jump_rotation_deg", toString(snapshot.last_jump_rotation_deg));
-    addKv(status, "reference_delta_m", snapshot.reference_delta_m < 0.0 ? "none" : toString(snapshot.reference_delta_m));
+    addKv(status, "reference_delta_m",
+          snapshot.reference_delta_m < 0.0 ? "none" : toString(snapshot.reference_delta_m));
     return status;
   }
 
- private:
+private:
   static core::HealthConfig toHealthConfig(const RouteConfig& config) {
     core::HealthConfig health;
     health.min_input_rate_hz = config.min_input_rate_hz;
@@ -123,4 +121,4 @@ class PoseRoute {
   ros::Publisher publisher_;
 };
 
-}  // namespace vrpn_router
+} // namespace vrpn_router

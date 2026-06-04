@@ -13,9 +13,8 @@
 namespace vrpn_router {
 
 class DiagnosticsPublisher {
- public:
-  DiagnosticsPublisher(ros::NodeHandle& nh, const std::vector<std::unique_ptr<PoseRoute>>& routes)
-      : routes_(routes) {
+public:
+  DiagnosticsPublisher(ros::NodeHandle& nh, const std::vector<std::unique_ptr<PoseRoute>>& routes) : routes_(routes) {
     publisher_ = nh.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 10);
   }
 
@@ -28,9 +27,9 @@ class DiagnosticsPublisher {
     publisher_.publish(array);
   }
 
- private:
+private:
   const std::vector<std::unique_ptr<PoseRoute>>& routes_;
   ros::Publisher publisher_;
 };
 
-}  // namespace vrpn_router
+} // namespace vrpn_router

@@ -45,7 +45,7 @@ void fillYawQuaternion(double yaw_rad, vrpn_float64 quaternion[4]) {
   quaternion[3] = q.w();
 }
 
-}  // namespace
+} // namespace
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "vrpn_router_test_vrpn_server");
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
           item.position[1] - jitter,
           item.position[2] + 0.5 * jitter,
       };
-      vrpn_float64 quaternion[4] {};
+      vrpn_float64 quaternion[4]{};
       fillYawQuaternion(after_jump ? item.yaw_after_rad : item.yaw_before_rad, quaternion);
 
       trackers[i]->report_pose(0, timestamp, position, quaternion);

@@ -7,9 +7,8 @@
 namespace vrpn_router {
 
 inline core::Pose toCorePose(const geometry_msgs::Pose& pose) {
-  return {
-      {pose.position.x, pose.position.y, pose.position.z},
-      {pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w}};
+  return {{pose.position.x, pose.position.y, pose.position.z},
+          {pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w}};
 }
 
 inline geometry_msgs::Pose toRosPose(const core::Pose& pose) {
@@ -24,4 +23,4 @@ inline geometry_msgs::Pose toRosPose(const core::Pose& pose) {
   return ros_pose;
 }
 
-}  // namespace vrpn_router
+} // namespace vrpn_router

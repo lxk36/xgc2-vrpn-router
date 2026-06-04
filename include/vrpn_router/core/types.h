@@ -45,10 +45,7 @@ inline double dot(const Vec3& a, const Vec3& b) {
 }
 
 inline Vec3 cross(const Vec3& a, const Vec3& b) {
-  return {
-      a.y * b.z - a.z * b.y,
-      a.z * b.x - a.x * b.z,
-      a.x * b.y - a.y * b.x};
+  return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
 
 inline double norm(const Vec3& value) {
@@ -70,11 +67,8 @@ inline Quat normalized(Quat q) {
 inline Quat multiply(const Quat& a_raw, const Quat& b_raw) {
   const Quat a = normalized(a_raw);
   const Quat b = normalized(b_raw);
-  return normalized({
-      a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-      a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-      a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-      a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z});
+  return normalized({a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y, a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+                     a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w, a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z});
 }
 
 inline Quat inverse(const Quat& q_raw) {
@@ -85,9 +79,7 @@ inline Quat inverse(const Quat& q_raw) {
 inline Vec3 rotate(const Quat& q_raw, const Vec3& v) {
   const Quat q = normalized(q_raw);
   const Vec3 u{q.x, q.y, q.z};
-  return (2.0 * dot(u, v)) * u +
-         (q.w * q.w - dot(u, u)) * v +
-         (2.0 * q.w) * cross(u, v);
+  return (2.0 * dot(u, v)) * u + (q.w * q.w - dot(u, u)) * v + (2.0 * q.w) * cross(u, v);
 }
 
 inline double distance(const Pose& a, const Pose& b) {
@@ -102,4 +94,4 @@ inline double angleDeg(const Quat& a_raw, const Quat& b_raw) {
   return 2.0 * std::acos(clamped) * 180.0 / M_PI;
 }
 
-}  // namespace vrpn_router::core
+} // namespace vrpn_router::core
