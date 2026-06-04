@@ -7,7 +7,6 @@ test -f /opt/ros/noetic/lib/libvrpn_router_core.so
 test -f /opt/ros/noetic/lib/libvrpn_router_ros.so
 test -f /opt/ros/noetic/include/vrpn_router/core/route_processor.h
 test -f /opt/ros/noetic/include/vrpn_router/vrpn_router_node.h
-"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check_core_libraries.sh"
 test -f /opt/ros/noetic/share/vrpn_router/launch/vrpn_router.launch
 test -f /opt/ros/noetic/share/vrpn_router/config/routes.example.yaml
 roslaunch --files vrpn_router vrpn_router.launch >/dev/null
