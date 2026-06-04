@@ -3,6 +3,7 @@ set -euo pipefail
 
 dpkg -s ros-noetic-xgc2-vrpn-router >/dev/null
 test -x /opt/ros/noetic/lib/vrpn_router/vrpn_router_node
+test -f /opt/ros/noetic/lib/libvrpn_router_core.so
 test -f /opt/ros/noetic/lib/libvrpn_router_ros.so
 test -f /opt/ros/noetic/include/vrpn_router/core/route_processor.h
 test -f /opt/ros/noetic/include/vrpn_router/vrpn_router_node.h

@@ -70,6 +70,7 @@ mkdir -p "${pkg_root}"
 copy_path "${PREFIX_ROOT}/share/${ROS_PACKAGE}" "${pkg_root}"
 copy_path "${PREFIX_ROOT}/lib/${ROS_PACKAGE}" "${pkg_root}"
 copy_path "${PREFIX_ROOT}/include/${ROS_PACKAGE}" "${pkg_root}"
+copy_path "${PREFIX_ROOT}/lib/libvrpn_router_core.so" "${pkg_root}"
 copy_path "${PREFIX_ROOT}/lib/libvrpn_router_ros.so" "${pkg_root}"
 
 mkdir -p "${pkg_root}/DEBIAN" "${pkg_root}/usr/share/doc/${PACKAGE}"

@@ -25,6 +25,7 @@ sources=(
   include/vrpn_router/topic_utils.h
   include/vrpn_router/vrpn_router_node.h
   include/vrpn_router/xmlrpc_config.h
+  src/core/route_processor.cpp
   src/vrpn_router_main.cpp
   src/vrpn_router_node.cpp
   test/core_tests.cpp
@@ -58,6 +59,7 @@ catkin_make -C "${workspace}" \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Woverloaded-virtual -Werror" \
+  vrpn_router_core \
   vrpn_router_ros \
   vrpn_router_node \
   vrpn_router_core_tests \

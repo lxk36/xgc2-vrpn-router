@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES vrpn_router_ros
+  LIBRARIES vrpn_router_core vrpn_router_ros
   CATKIN_DEPENDS diagnostic_msgs geometry_msgs roscpp xmlrpcpp
 )
 
@@ -19,12 +19,20 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(vrpn_router_core
+  src/core/route_processor.cpp
+)
+target_compile_features(vrpn_router_core PUBLIC cxx_std_17)
+
 add_library(vrpn_router_ros
   src/vrpn_router_node.cpp
 )
 add_dependencies(vrpn_router_ros ${catkin_EXPORTED_TARGETS})
 target_compile_features(vrpn_router_ros PUBLIC cxx_std_17)
-target_link_libraries(vrpn_router_ros ${catkin_LIBRARIES})
+target_link_libraries(vrpn_router_ros
+  vrpn_router_core
+  ${catkin_LIBRARIES}
+)
 
 add_executable(vrpn_router_node
   src/vrpn_router_main.cpp
@@ -36,7 +44,7 @@ target_link_libraries(vrpn_router_node
   ${catkin_LIBRARIES}
 )
 
-install(TARGETS vrpn_router_ros vrpn_router_node
+install(TARGETS vrpn_router_core vrpn_router_ros vrpn_router_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -58,7 +66,10 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(vrpn_router_core_tests test/core_tests.cpp)
   if(TARGET vrpn_router_core_tests)
     target_compile_features(vrpn_router_core_tests PUBLIC cxx_std_17)
-    target_link_libraries(vrpn_router_core_tests ${catkin_LIBRARIES})
+    target_link_libraries(vrpn_router_core_tests
+      vrpn_router_core
+      ${catkin_LIBRARIES}
+    )
   endif()
 
   add_executable(vrpn_router_test_vrpn_server_node
