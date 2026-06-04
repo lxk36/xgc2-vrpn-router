@@ -58,6 +58,28 @@ roslaunch vrpn_router vrpn_router.launch \
   config:=/path/to/routes.yaml
 ```
 
+For a downstream quickstart that injects route parameters itself, disable the
+default YAML load:
+
+```bash
+roslaunch vrpn_router vrpn_router.launch \
+  load_config:=false \
+  start_vrpn_client:=true
+```
+
+To preserve VRPN server timestamps from the client output and restrict the
+client to one tracker, inject the client parameters explicitly:
+
+```bash
+roslaunch vrpn_router vrpn_router.launch \
+  server:=127.0.0.1 \
+  port:=3883 \
+  config:=/path/to/routes.yaml \
+  use_server_time:=true \
+  refresh_tracker_frequency:=0.0 \
+  trackers:=uav1
+```
+
 Input topics normally follow the `vrpn_client_ros` convention:
 
 ```text
@@ -252,4 +274,3 @@ DESTDIR=/tmp/xgc2-vrpn-router-release-ws/install-root \
 - Architectures: amd64, arm64
 - Apt repository: `https://xgc2.apt.xiaokang.ink`
 - CI workflow: `.github/workflows/build-debs.yml`
-
