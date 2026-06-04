@@ -65,6 +65,8 @@ catkin_make -C "${workspace}" \
   vrpn_router_core_tests \
   vrpn_router_test_vrpn_server_node
 
+"${repo_root}/.xgc2/scripts/check_core_libraries.sh" --prefix "${workspace}/devel"
+
 clang_tidy_sources=(
   "${workspace}/src/vrpn_router/src/vrpn_router_main.cpp"
   "${workspace}/src/vrpn_router/src/vrpn_router_node.cpp"

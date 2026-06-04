@@ -50,6 +50,7 @@ jobs:
           test -f package.xml
           test -f .xgc2/product.yml
           test -x .xgc2/scripts/build_debs_in_docker.sh
+          test -x .xgc2/scripts/check_core_libraries.sh
           test -x .xgc2/scripts/check_cpp_quality.sh
           test -x .xgc2/scripts/check_installed_packages.sh
           test -x .xgc2/scripts/package_debs.sh
