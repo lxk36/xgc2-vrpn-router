@@ -13,6 +13,7 @@ sources=(
   include/vrpn_router/core/pose_transformer.h
   include/vrpn_router/core/rate_limiter.h
   include/vrpn_router/core/reference_delta_detector.h
+  include/vrpn_router/core/route_processor.h
   include/vrpn_router/core/stuck_detector.h
   include/vrpn_router/core/timeout_detector.h
   include/vrpn_router/core/types.h
@@ -22,7 +23,9 @@ sources=(
   include/vrpn_router/ros_pose_adapter.h
   include/vrpn_router/route_config.h
   include/vrpn_router/topic_utils.h
+  include/vrpn_router/vrpn_router_node.h
   include/vrpn_router/xmlrpc_config.h
+  src/vrpn_router_main.cpp
   src/vrpn_router_node.cpp
   test/core_tests.cpp
   test/vrpn_test_server_node.cpp
@@ -55,11 +58,13 @@ catkin_make -C "${workspace}" \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Wnon-virtual-dtor -Woverloaded-virtual -Werror" \
+  vrpn_router_ros \
   vrpn_router_node \
   vrpn_router_core_tests \
   vrpn_router_test_vrpn_server_node
 
 clang_tidy_sources=(
+  "${workspace}/src/vrpn_router/src/vrpn_router_main.cpp"
   "${workspace}/src/vrpn_router/src/vrpn_router_node.cpp"
   "${workspace}/src/vrpn_router/test/core_tests.cpp"
   "${workspace}/src/vrpn_router/test/vrpn_test_server_node.cpp"

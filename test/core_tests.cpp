@@ -4,6 +4,7 @@
 #include "vrpn_router/core/pose_transformer.h"
 #include "vrpn_router/core/rate_limiter.h"
 #include "vrpn_router/core/reference_delta_detector.h"
+#include "vrpn_router/core/route_processor.h"
 #include "vrpn_router/core/stuck_detector.h"
 #include "vrpn_router/core/timeout_detector.h"
 #include "vrpn_router/core/types.h"
@@ -26,6 +27,9 @@ using vrpn_router::core::PoseTransformer;
 using vrpn_router::core::Quat;
 using vrpn_router::core::RateLimiter;
 using vrpn_router::core::ReferenceDeltaDetector;
+using vrpn_router::core::RouteProcessor;
+using vrpn_router::core::RouteProcessorConfig;
+using vrpn_router::core::RouteProcessResult;
 using vrpn_router::core::StuckDetector;
 using vrpn_router::core::TimeoutDetector;
 using vrpn_router::core::Transform;
@@ -220,6 +224,42 @@ TEST(HealthMonitor, ReportsTimeoutStuckAndReferenceDelta) {
   EXPECT_NE(std::find(snapshot.problems.begin(), snapshot.problems.end(), "vrpn_stuck"), snapshot.problems.end());
   EXPECT_NE(std::find(snapshot.problems.begin(), snapshot.problems.end(), "reference_delta_high"),
             snapshot.problems.end());
+}
+
+TEST(RouteProcessor, TransformsPublishesAndTracksHealth) {
+  RouteProcessorConfig config;
+  config.tracker_to_body.translation = Vec3{1.0, 0.0, 0.0};
+  config.field_offset = Vec3{10.0, -2.0, 0.5};
+  config.max_output_rate_hz = 100.0;
+  RouteProcessor processor(config);
+
+  const RouteProcessResult result = processor.onInput(Pose{{1.0, 2.0, 3.0}, {}}, 1.0);
+  const auto snapshot = processor.snapshot(1.0);
+
+  EXPECT_TRUE(result.should_publish);
+  EXPECT_FALSE(result.dropped_by_rate);
+  EXPECT_NEAR(result.output.position.x, 12.0, 1e-9);
+  EXPECT_NEAR(result.output.position.y, 0.0, 1e-9);
+  EXPECT_NEAR(result.output.position.z, 3.5, 1e-9);
+  EXPECT_EQ(snapshot.received_count, 1u);
+  EXPECT_EQ(snapshot.published_count, 1u);
+}
+
+TEST(RouteProcessor, AppliesRateLimitWithoutDroppingInputHealth) {
+  RouteProcessorConfig config;
+  config.max_output_rate_hz = 10.0;
+  RouteProcessor processor(config);
+
+  const RouteProcessResult first = processor.onInput(Pose{{0.0, 0.0, 0.0}, {}}, 1.0);
+  const RouteProcessResult second = processor.onInput(Pose{{1.0, 0.0, 0.0}, {}}, 1.01);
+  const auto snapshot = processor.snapshot(1.01);
+
+  EXPECT_TRUE(first.should_publish);
+  EXPECT_FALSE(second.should_publish);
+  EXPECT_TRUE(second.dropped_by_rate);
+  EXPECT_EQ(snapshot.received_count, 2u);
+  EXPECT_EQ(snapshot.published_count, 1u);
+  EXPECT_EQ(snapshot.dropped_by_rate_count, 1u);
 }
 
 TEST(RouteConfig, LoadsParameterizedRoute) {
