@@ -1,52 +1,51 @@
-vrpn_router:
-  vrpn_pose_suffix: pose
-  mavros_pose_suffix: vision_pose/pose
-  output_frame_id: map
-  queue_size: 10
-  diagnostics_rate_hz: 1.0
-  max_output_rate_hz: 50.0
-  min_input_rate_hz: 30.0
-  max_input_rate_hz: 150.0
-  stale_timeout_s: 0.3
-  stuck_timeout_s: 0.5
-  stuck_position_epsilon_m: 0.001
-  stuck_angle_epsilon_deg: 0.2
-  max_translation_jump_m: 1.0
-  max_rotation_jump_deg: 45.0
-  max_reference_delta_m: 2.0
-  field_offset:
+vrpn_pose_suffix: pose
+mavros_pose_suffix: vision_pose/pose
+output_frame_id: map
+queue_size: 10
+diagnostics_rate_hz: 1.0
+max_output_rate_hz: 50.0
+min_input_rate_hz: 30.0
+max_input_rate_hz: 150.0
+stale_timeout_s: 0.3
+stuck_timeout_s: 0.5
+stuck_position_epsilon_m: 0.001
+stuck_angle_epsilon_deg: 0.2
+max_translation_jump_m: 1.0
+max_rotation_jump_deg: 45.0
+max_reference_delta_m: 2.0
+field_offset:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+tracker_to_body:
+  translation:
     x: 0.0
     y: 0.0
     z: 0.0
-  tracker_to_body:
-    translation:
+  rotation:
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+routes:
+  - tracker: uav1
+    mavros_ns: /uav1/mavros
+    max_output_rate_hz: 50.0
+  - tracker: uav2
+    mavros_ns: /uav2/mavros
+    max_output_rate_hz: 50.0
+  - tracker: fs150
+    mavros_ns: /fs150/mavros
+    max_output_rate_hz: 40.0
+    field_offset:
       x: 0.0
       y: 0.0
       z: 0.0
-    rotation:
-      roll: 0.0
-      pitch: 0.0
-      yaw: 0.0
-  routes:
-    - tracker: uav1
-      mavros_ns: /uav1/mavros
-      max_output_rate_hz: 50.0
-    - tracker: uav2
-      mavros_ns: /uav2/mavros
-      max_output_rate_hz: 50.0
-    - tracker: fs150
-      mavros_ns: /fs150/mavros
-      max_output_rate_hz: 40.0
-      field_offset:
+    tracker_to_body:
+      translation:
         x: 0.0
         y: 0.0
         z: 0.0
-      tracker_to_body:
-        translation:
-          x: 0.0
-          y: 0.0
-          z: 0.0
-        rotation:
-          roll: 0.0
-          pitch: 0.0
-          yaw: 0.0
+      rotation:
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0

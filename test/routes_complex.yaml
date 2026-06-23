@@ -1,76 +1,75 @@
-vrpn_router:
-  vrpn_pose_suffix: pose
-  mavros_pose_suffix: vision_pose/pose
-  output_frame_id: map
-  queue_size: 100
-  diagnostics_rate_hz: 20.0
-  max_output_rate_hz: 50.0
-  min_input_rate_hz: 30.0
-  max_input_rate_hz: 90.0
-  stale_timeout_s: 0.4
-  stuck_timeout_s: 0.2
-  stuck_position_epsilon_m: 5.0e-8
-  stuck_angle_epsilon_deg: 0.05
-  max_translation_jump_m: 2.0
-  max_rotation_jump_deg: 20.0
-  max_reference_delta_m: 2.0
-  field_offset:
+vrpn_pose_suffix: pose
+mavros_pose_suffix: vision_pose/pose
+output_frame_id: map
+queue_size: 100
+diagnostics_rate_hz: 20.0
+max_output_rate_hz: 50.0
+min_input_rate_hz: 30.0
+max_input_rate_hz: 90.0
+stale_timeout_s: 0.4
+stuck_timeout_s: 0.2
+stuck_position_epsilon_m: 5.0e-8
+stuck_angle_epsilon_deg: 0.05
+max_translation_jump_m: 2.0
+max_rotation_jump_deg: 20.0
+max_reference_delta_m: 2.0
+field_offset:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+tracker_to_body:
+  translation:
     x: 0.0
     y: 0.0
     z: 0.0
-  tracker_to_body:
-    translation:
-      x: 0.0
+  rotation:
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+routes:
+  - name: uav1
+    tracker: uav1
+    mavros_ns: /uav1/mavros
+    max_output_rate_hz: 50.0
+    field_offset:
+      x: 10.0
       y: 0.0
       z: 0.0
-    rotation:
-      roll: 0.0
-      pitch: 0.0
-      yaw: 0.0
-  routes:
-    - name: uav1
-      tracker: uav1
-      mavros_ns: /uav1/mavros
-      max_output_rate_hz: 50.0
-      field_offset:
-        x: 10.0
+    tracker_to_body:
+      translation:
+        x: 1.0
         y: 0.0
         z: 0.0
-      tracker_to_body:
-        translation:
-          x: 1.0
-          y: 0.0
-          z: 0.0
-        rotation:
-          roll: 0.0
-          pitch: 0.0
-          yaw: 0.0
-    - name: uav2
-      tracker: uav2
-      mavros_ns: /uav2/mavros
-      max_output_rate_hz: 40.0
-      max_rotation_jump_deg: 30.0
-      field_offset:
+      rotation:
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+  - name: uav2
+    tracker: uav2
+    mavros_ns: /uav2/mavros
+    max_output_rate_hz: 40.0
+    max_rotation_jump_deg: 30.0
+    field_offset:
+      x: 0.0
+      y: -5.0
+      z: 0.0
+    tracker_to_body:
+      translation:
         x: 0.0
-        y: -5.0
+        y: 0.5
         z: 0.0
-      tracker_to_body:
-        translation:
-          x: 0.0
-          y: 0.5
-          z: 0.0
-        rotation:
-          roll: 0.0
-          pitch: 0.0
-          yaw: 0.0
-    - name: ugv1
-      tracker: ugv1
-      mavros_ns: /ugv1/mavros
-      output_topic: /ugv1/vision_pose_custom
-      reference_topic: ""
-      max_output_rate_hz: 25.0
-      max_translation_jump_m: 5.0
-      field_offset:
-        x: 0.0
-        y: 0.0
-        z: -1.0
+      rotation:
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+  - name: ugv1
+    tracker: ugv1
+    mavros_ns: /ugv1/mavros
+    output_topic: /ugv1/vision_pose_custom
+    reference_topic: ""
+    max_output_rate_hz: 25.0
+    max_translation_jump_m: 5.0
+    field_offset:
+      x: 0.0
+      y: 0.0
+      z: -1.0

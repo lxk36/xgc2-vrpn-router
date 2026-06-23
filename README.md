@@ -47,7 +47,7 @@ The default launch file can start `vrpn_client_ros` and then start `vrpn_router`
 roslaunch vrpn_router vrpn_router.launch \
   server:=127.0.0.1 \
   port:=3883 \
-  config:=$(rospack find vrpn_router)/config/routes.example.yaml
+  config_file:=$(rospack find vrpn_router)/config/routes.example.yaml
 ```
 
 For an externally managed `vrpn_client_ros`, disable the built-in client:
@@ -55,7 +55,7 @@ For an externally managed `vrpn_client_ros`, disable the built-in client:
 ```bash
 roslaunch vrpn_router vrpn_router.launch \
   start_vrpn_client:=false \
-  config:=/path/to/routes.yaml
+  config_file:=/path/to/routes.yaml
 ```
 
 For a downstream quickstart that injects route parameters itself, disable the
@@ -74,7 +74,7 @@ client to one tracker, inject the client parameters explicitly:
 roslaunch vrpn_router vrpn_router.launch \
   server:=127.0.0.1 \
   port:=3883 \
-  config:=/path/to/routes.yaml \
+  config_file:=/path/to/routes.yaml \
   use_server_time:=true \
   refresh_tracker_frequency:=0.0 \
   trackers:=uav1
@@ -105,7 +105,9 @@ Example:
 
 ## Route Configuration
 
-Routes are configured through YAML loaded under the private `vrpn_router` namespace. The installed example is:
+Routes are configured through YAML loaded inside the `vrpn_router` node's private
+namespace. The YAML file itself is not wrapped in an extra `vrpn_router:` key.
+The installed example is:
 
 ```bash
 roscd vrpn_router
@@ -115,26 +117,24 @@ cat config/routes.example.yaml
 Minimal route:
 
 ```yaml
-vrpn_router:
-  output_frame_id: map
-  max_output_rate_hz: 50.0
-  routes:
-    - tracker: uav1
-      mavros_ns: /uav1/mavros
+output_frame_id: map
+max_output_rate_hz: 50.0
+routes:
+  - tracker: uav1
+    mavros_ns: /uav1/mavros
 ```
 
 Explicit route:
 
 ```yaml
-vrpn_router:
-  routes:
-    - name: uav1
-      tracker: uav1
-      input_topic: /vrpn_client_node/uav1/pose
-      output_topic: /uav1/mavros/vision_pose/pose
-      reference_topic: /uav1/mavros/local_position/pose
-      output_frame_id: map
-      max_output_rate_hz: 50.0
+routes:
+  - name: uav1
+    tracker: uav1
+    input_topic: /vrpn_client_node/uav1/pose
+    output_topic: /uav1/mavros/vision_pose/pose
+    reference_topic: /uav1/mavros/local_position/pose
+    output_frame_id: map
+    max_output_rate_hz: 50.0
 ```
 
 Each route can override global defaults, including output rate, health thresholds, field offset, and tracker-to-body transform.
@@ -176,30 +176,28 @@ Important semantics:
 Global defaults:
 
 ```yaml
-vrpn_router:
-  max_output_rate_hz: 50.0
-  min_input_rate_hz: 30.0
-  max_input_rate_hz: 150.0
-  stale_timeout_s: 0.3
-  stuck_timeout_s: 0.5
-  stuck_position_epsilon_m: 0.001
-  stuck_angle_epsilon_deg: 0.2
-  max_translation_jump_m: 1.0
-  max_rotation_jump_deg: 45.0
-  max_reference_delta_m: 2.0
+max_output_rate_hz: 50.0
+min_input_rate_hz: 30.0
+max_input_rate_hz: 150.0
+stale_timeout_s: 0.3
+stuck_timeout_s: 0.5
+stuck_position_epsilon_m: 0.001
+stuck_angle_epsilon_deg: 0.2
+max_translation_jump_m: 1.0
+max_rotation_jump_deg: 45.0
+max_reference_delta_m: 2.0
 ```
 
 Tracker-to-body and field compensation:
 
 ```yaml
-vrpn_router:
-  field_offset:
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  tracker_to_body:
-    translation: {x: 0.0, y: 0.0, z: 0.0}
-    rotation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
+field_offset:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+tracker_to_body:
+  translation: {x: 0.0, y: 0.0, z: 0.0}
+  rotation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
 ```
 
 ## What This Product Owns

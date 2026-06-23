@@ -1,28 +1,28 @@
 <launch>
-  <param name="vrpn_router/vrpn_pose_suffix" value="pose"/>
-  <param name="vrpn_router/mavros_pose_suffix" value="vision_pose/pose"/>
-  <param name="vrpn_router/output_frame_id" value="map"/>
-  <param name="vrpn_router/max_output_rate_hz" value="50.0"/>
-  <param name="vrpn_router/diagnostics_rate_hz" value="10.0"/>
-  <param name="vrpn_router/min_input_rate_hz" value="30.0"/>
-  <param name="vrpn_router/max_input_rate_hz" value="80.0"/>
-  <param name="vrpn_router/stale_timeout_s" value="0.2"/>
-  <param name="vrpn_router/stuck_timeout_s" value="0.1"/>
-  <param name="vrpn_router/stuck_position_epsilon_m" value="0.01"/>
-  <param name="vrpn_router/max_translation_jump_m" value="0.5"/>
-  <param name="vrpn_router/max_reference_delta_m" value="0.5"/>
-  <rosparam param="vrpn_router/field_offset">{x: 10.0, y: 0.0, z: 0.0}</rosparam>
-  <rosparam param="vrpn_router/tracker_to_body">
-    translation: {x: 1.0, y: 0.0, z: 0.0}
-    rotation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
-  </rosparam>
-  <rosparam param="vrpn_router/routes">
-    - tracker: uav1
-      mavros_ns: /uav1/mavros
-      input_topic: /test/vrpn/uav1/pose
-      reference_topic: /uav1/mavros/local_position/pose
-  </rosparam>
-
-  <node pkg="vrpn_router" type="vrpn_router_node" name="vrpn_router" output="screen"/>
+  <node pkg="vrpn_router" type="vrpn_router_node" name="vrpn_router" output="screen" clear_params="true">
+    <param name="vrpn_pose_suffix" value="pose"/>
+    <param name="mavros_pose_suffix" value="vision_pose/pose"/>
+    <param name="output_frame_id" value="map"/>
+    <param name="max_output_rate_hz" value="50.0"/>
+    <param name="diagnostics_rate_hz" value="10.0"/>
+    <param name="min_input_rate_hz" value="30.0"/>
+    <param name="max_input_rate_hz" value="80.0"/>
+    <param name="stale_timeout_s" value="0.2"/>
+    <param name="stuck_timeout_s" value="0.1"/>
+    <param name="stuck_position_epsilon_m" value="0.01"/>
+    <param name="max_translation_jump_m" value="0.5"/>
+    <param name="max_reference_delta_m" value="0.5"/>
+    <rosparam param="field_offset">{x: 10.0, y: 0.0, z: 0.0}</rosparam>
+    <rosparam param="tracker_to_body">
+      translation: {x: 1.0, y: 0.0, z: 0.0}
+      rotation: {roll: 0.0, pitch: 0.0, yaw: 0.0}
+    </rosparam>
+    <rosparam param="routes">
+      - tracker: uav1
+        mavros_ns: /uav1/mavros
+        input_topic: /test/vrpn/uav1/pose
+        reference_topic: /uav1/mavros/local_position/pose
+    </rosparam>
+  </node>
   <test test-name="vrpn_router_e2e" pkg="vrpn_router" type="vrpn_router_e2e.py" time-limit="20"/>
 </launch>

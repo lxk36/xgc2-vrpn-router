@@ -3,7 +3,7 @@
   <arg name="server" default="127.0.0.1"/>
   <arg name="port" default="3883"/>
   <arg name="frame_id" default="map"/>
-  <arg name="config" default="$(find vrpn_router)/config/routes.example.yaml"/>
+  <arg name="config_file" default="$(find vrpn_router)/config/routes.example.yaml"/>
   <arg name="load_config" default="true"/>
   <arg name="start_vrpn_client" default="true"/>
   <arg name="update_frequency" default="100.0"/>
@@ -11,8 +11,6 @@
   <arg name="broadcast_tf" default="false"/>
   <arg name="refresh_tracker_frequency" default="1.0"/>
   <arg name="trackers" default=""/>
-
-  <rosparam if="$(arg load_config)" command="load" file="$(arg config)"/>
 
   <node if="$(arg start_vrpn_client)"
         pkg="vrpn_client_ros"
@@ -34,5 +32,7 @@
   <node pkg="vrpn_router"
         type="vrpn_router_node"
         name="vrpn_router"
-        output="screen"/>
+        output="screen">
+    <rosparam if="$(arg load_config)" command="load" file="$(arg config_file)" subst_value="true"/>
+  </node>
 </launch>
