@@ -102,7 +102,7 @@ find "${pkg_root}" -type f -exec chmod 0644 {} +
 chmod 0755 "${pkg_root}/usr/bin/xgc2-vrpn-router"
 strip --strip-unneeded "${pkg_root}/usr/bin/xgc2-vrpn-router" 2>/dev/null || true
 
-depends="libc6, libgcc-s1, libstdc++6, systemd"
+depends="libc6, libgcc-s1, libstdc++6, netbase, systemd"
 (
   cd "${BUILD_DIR}"
   mkdir -p debian
@@ -122,7 +122,7 @@ EOF
   if dpkg-shlibdeps -O "${pkg_root}/usr/bin/xgc2-vrpn-router" > shlibs 2>/dev/null; then
     shlibs_depends="$(sed -n 's/^shlibs:Depends=//p' shlibs)"
     if [[ -n "${shlibs_depends}" ]]; then
-      depends="${shlibs_depends}, systemd"
+      depends="${shlibs_depends}, netbase, systemd"
     fi
   fi
 )
