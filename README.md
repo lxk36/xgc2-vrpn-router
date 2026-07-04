@@ -82,3 +82,16 @@ Sensors = 1
 `BindAddress` can be empty to listen on all interfaces.  `MainloopRate` controls
 how often the router services VRPN connections.  `UpstreamUpdateRate` requests a
 tracker update rate from the upstream server when supported.
+
+## End-to-End Test
+
+CI runs an installed-package E2E test with official VRPN tools:
+
+```bash
+.xgc2/scripts/run_official_vrpn_e2e.sh \
+  --router-binary /usr/bin/xgc2-vrpn-router
+```
+
+The test starts official `vrpn_server` with `vrpn_Tracker_NULL`, runs
+`xgc2-vrpn-router`, and verifies the downstream endpoint with official
+`vrpn_print_devices`.

@@ -9,6 +9,7 @@ DOCKER_IMAGE="${DOCKER_IMAGE:-ubuntu:${UBUNTU_VERSION}}"
 WORK_DIR="${WORK_DIR:-${REPO_ROOT}/.work/docker-${UBUNTU_VERSION}}"
 OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/debs}"
 INSTALL_CHECK="${INSTALL_CHECK:-true}"
+E2E_CHECK="${E2E_CHECK:-true}"
 VRPN_VERSION="${VRPN_VERSION:-v07.36}"
 
 while [[ $# -gt 0 ]]; do
@@ -32,6 +33,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skip-install-check)
       INSTALL_CHECK=false
+      shift
+      ;;
+    --skip-e2e)
+      E2E_CHECK=false
       shift
       ;;
     --vrpn-version)
@@ -67,6 +72,7 @@ docker pull "${DOCKER_IMAGE}"
 docker run --rm \
   -e DEBIAN_FRONTEND=noninteractive \
   -e INSTALL_CHECK="${INSTALL_CHECK}" \
+  -e E2E_CHECK="${E2E_CHECK}" \
   -e APT_REPO_DISTRIBUTION="${APT_REPO_DISTRIBUTION}" \
   -e VRPN_VERSION="${VRPN_VERSION}" \
   -v "${REPO_ROOT}:/workspace/vrpn-router:ro" \
@@ -138,6 +144,13 @@ docker run --rm \
     if [[ "${INSTALL_CHECK}" == "true" ]]; then
       apt-get install -y /workspace/out/xgc2-vrpn-router_*.deb
       /workspace/vrpn-router/.xgc2/scripts/check_installed_package.sh
+    fi
+
+    if [[ "${E2E_CHECK}" == "true" ]]; then
+      /workspace/vrpn-router/.xgc2/scripts/run_official_vrpn_e2e.sh \
+        --vrpn-source /workspace/work/vrpn-src \
+        --work-dir /workspace/work/e2e \
+        --router-binary /usr/bin/xgc2-vrpn-router
     fi
   '
 

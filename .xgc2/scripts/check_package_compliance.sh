@@ -10,6 +10,7 @@ required_files=(
   ".xgc2/scripts/package_deb.sh"
   ".xgc2/scripts/check_installed_package.sh"
   ".xgc2/scripts/publish_apt_repo.sh"
+  ".xgc2/scripts/run_official_vrpn_e2e.sh"
   ".github/workflows/ci.yml"
   ".github/workflows/release.yml"
   "CMakeLists.txt"
