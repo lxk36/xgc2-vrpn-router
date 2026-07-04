@@ -23,9 +23,25 @@ portable tracker enumeration API.
 ## Build
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+git clone --depth 1 --branch v07.36 https://github.com/vrpn/vrpn.git /tmp/vrpn
+cmake -S /tmp/vrpn -B /tmp/vrpn-build -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/tmp/vrpn-install \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DVRPN_INSTALL=ON \
+  -DVRPN_BUILD_CLIENTS=OFF \
+  -DVRPN_BUILD_SERVERS=OFF \
+  -DVRPN_BUILD_CLIENT_LIBRARY=OFF \
+  -DVRPN_BUILD_SERVER_LIBRARY=ON
+cmake --build /tmp/vrpn-build --target vrpnserver quat
+cmake --install /tmp/vrpn-build
+
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVRPN_ROOT=/tmp/vrpn-install
 cmake --build build
 ```
+
+The CI package build uses the same pinned upstream VRPN release and links it
+statically, so the Debian package does not depend on an Ubuntu-provided
+`libvrpn-dev` package.
 
 ## Run
 

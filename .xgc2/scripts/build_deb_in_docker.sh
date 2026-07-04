@@ -9,6 +9,7 @@ DOCKER_IMAGE="${DOCKER_IMAGE:-ubuntu:${UBUNTU_VERSION}}"
 WORK_DIR="${WORK_DIR:-${REPO_ROOT}/.work/docker-${UBUNTU_VERSION}}"
 OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/debs}"
 INSTALL_CHECK="${INSTALL_CHECK:-true}"
+VRPN_VERSION="${VRPN_VERSION:-v07.36}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -32,6 +33,10 @@ while [[ $# -gt 0 ]]; do
     --skip-install-check)
       INSTALL_CHECK=false
       shift
+      ;;
+    --vrpn-version)
+      VRPN_VERSION="$2"
+      shift 2
       ;;
     *)
       echo "unknown argument: $1" >&2
@@ -63,6 +68,7 @@ docker run --rm \
   -e DEBIAN_FRONTEND=noninteractive \
   -e INSTALL_CHECK="${INSTALL_CHECK}" \
   -e APT_REPO_DISTRIBUTION="${APT_REPO_DISTRIBUTION}" \
+  -e VRPN_VERSION="${VRPN_VERSION}" \
   -v "${REPO_ROOT}:/workspace/vrpn-router:ro" \
   -v "${WORK_DIR}:/workspace/work" \
   -v "${OUTPUT_DIR}:/workspace/out" \
@@ -80,13 +86,38 @@ docker run --rm \
       fakeroot \
       file \
       git \
-      libvrpn-dev \
       ninja-build \
       pkg-config \
       rsync \
       systemd
 
-    rm -rf /workspace/work/src /workspace/work/build /workspace/work/install-root
+    rm -rf \
+      /workspace/work/src \
+      /workspace/work/build \
+      /workspace/work/install-root \
+      /workspace/work/vrpn-src \
+      /workspace/work/vrpn-build \
+      /workspace/work/vrpn-install
+
+    git clone --depth 1 --branch "${VRPN_VERSION}" https://github.com/vrpn/vrpn.git /workspace/work/vrpn-src
+    cmake -S /workspace/work/vrpn-src -B /workspace/work/vrpn-build \
+      -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/workspace/work/vrpn-install \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DBUILD_TESTING=OFF \
+      -DVRPN_INSTALL=ON \
+      -DVRPN_BUILD_CLIENTS=OFF \
+      -DVRPN_BUILD_SERVERS=OFF \
+      -DVRPN_BUILD_CLIENT_LIBRARY=OFF \
+      -DVRPN_BUILD_SERVER_LIBRARY=ON \
+      -DVRPN_BUILD_PYTHON=OFF \
+      -DVRPN_BUILD_PYTHON_HANDCODED_2X=OFF \
+      -DVRPN_BUILD_PYTHON_HANDCODED_3X=OFF \
+      -DVRPN_BUILD_JAVA=OFF
+    cmake --build /workspace/work/vrpn-build --target vrpnserver quat
+    cmake --install /workspace/work/vrpn-build
+
     mkdir -p /workspace/work/src
     rsync -a --delete /workspace/vrpn-router/ /workspace/work/src/
 
@@ -94,7 +125,8 @@ docker run --rm \
     cmake -S . -B /workspace/work/build \
       -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DVRPN_ROOT=/workspace/work/vrpn-install
     cmake --build /workspace/work/build
     DESTDIR=/workspace/work/install-root cmake --install /workspace/work/build
 

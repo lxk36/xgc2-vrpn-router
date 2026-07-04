@@ -102,7 +102,7 @@ find "${pkg_root}" -type f -exec chmod 0644 {} +
 chmod 0755 "${pkg_root}/usr/bin/xgc2-vrpn-router"
 strip --strip-unneeded "${pkg_root}/usr/bin/xgc2-vrpn-router" 2>/dev/null || true
 
-depends="libc6, libgcc-s1, libstdc++6, libquat1 | libquat1t64, libvrpn0 | libvrpn0t64, systemd"
+depends="libc6, libgcc-s1, libstdc++6, systemd"
 (
   cd "${BUILD_DIR}"
   mkdir -p debian

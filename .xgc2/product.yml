@@ -14,7 +14,6 @@ apt:
   - libc6
   - libgcc-s1
   - libstdc++6
-  - libvrpn0 | libvrpn0t64
   - systemd
 usage:
   install: 'sudo apt update
