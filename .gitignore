@@ -1,0 +1,15 @@
+build/
+debs/
+.work/
+install-root/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+*.deb
+*.o
+*.a
+*.so
+*.swp

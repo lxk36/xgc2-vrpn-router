@@ -1,0 +1,13 @@
+[Unit]
+Description=XGC2 VRPN router
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/xgc2-vrpn-router --config /etc/xgc2/vrpn-router/router.conf
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  formatting-check:
+    name: formatting-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run clang-format style check on src directory
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: "13"
+          check-path: "src"
+
+  package-compliance:
+    name: package-compliance
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run package compliance checks
+        run: .xgc2/scripts/check_package_compliance.sh
+
+  build:
+    name: debs-${{ matrix.distro }}-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: focal
+            ubuntu_version: "20.04"
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: focal
+            ubuntu_version: "20.04"
+            arch: arm64
+            runner: ubuntu-24.04-arm
+          - distro: jammy
+            ubuntu_version: "22.04"
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: jammy
+            ubuntu_version: "22.04"
+            arch: arm64
+            runner: ubuntu-24.04-arm
+          - distro: noble
+            ubuntu_version: "24.04"
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: noble
+            ubuntu_version: "24.04"
+            arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and install-check deb package in Docker
+        run: |
+          set -euo pipefail
+          .xgc2/scripts/build_deb_in_docker.sh \
+            --ubuntu-version "${{ matrix.ubuntu_version }}" \
+            --work-dir "$RUNNER_TEMP/vrpn-router-${{ matrix.distro }}-${{ matrix.arch }}" \
+            --output-dir "$GITHUB_WORKSPACE/debs"
+
+      - name: Upload deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xgc2-vrpn-router-${{ matrix.distro }}-${{ matrix.arch }}
+          path: debs/*.deb
