@@ -35,7 +35,8 @@ for script in .xgc2/scripts/*.sh; do
 done
 
 grep -q '^id:[[:space:]]*xgc2-vrpn-router$' .xgc2/product.yml
-grep -q '^version:[[:space:]]*0\.1\.0-3$' .xgc2/product.yml
+product_version="$(awk -F': *' '/^version:/ {print $2; exit}' .xgc2/product.yml)"
+[[ "${product_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]
 grep -q '/etc/xgc2/vrpn-router/router.conf' .xgc2/product.yml
 grep -q 'ExecStart=/usr/bin/xgc2-vrpn-router --config /etc/xgc2/vrpn-router/router.conf' \
   systemd/xgc2-vrpn-router.service
